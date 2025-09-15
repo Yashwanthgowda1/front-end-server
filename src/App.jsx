@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Download, RefreshCw } from 'lucide-react';
 
-// Use proxy for development, direct URL for production
-const API_BASE_URL = import.meta.env.DEV ? '/api' : 'https://backend-server-git-main-yashwanths-projects-7a956bf7.vercel.app/api';
+// Fixed API configuration - use environment variable or fallback to direct URL
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://backend-server-git-main-yashwanths-projects-7a956bf7.vercel.app';
+const AUTH_TOKEN = import.meta.env.VITE_AUTH_TOKEN; // Add auth token if needed
 
 function App() {
   const [employees, setEmployees] = useState([]);
@@ -42,26 +43,48 @@ function App() {
     }
   }, [attendanceType, selectedFromDate]);
 
-  // Enhanced API Functions with better error handling
+  // Enhanced API Functions with better error handling and authentication
   const apiCall = async (url, options = {}) => {
     try {
       console.log('Making API call to:', `${API_BASE_URL}${url}`);
       
+      const headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        ...options.headers
+      };
+
+      // Add authentication if token is available
+      if (AUTH_TOKEN) {
+        headers['Authorization'] = `Bearer ${AUTH_TOKEN}`;
+        // Or use API key format if needed:
+        // headers['x-api-key'] = AUTH_TOKEN;
+      }
+      
       const response = await fetch(`${API_BASE_URL}${url}`, {
-        mode: 'cors', // Explicitly set CORS mode
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          ...options.headers
-        },
+        mode: 'cors',
+        headers,
         ...options
       });
       
       console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
       
       if (!response.ok) {
         const errorText = await response.text();
         console.error('API Error Response:', errorText);
+        
+        // Handle specific error cases
+        if (response.status === 401) {
+          throw new Error('Authentication required - please check your credentials');
+        } else if (response.status === 403) {
+          throw new Error('Access forbidden - insufficient permissions');
+        } else if (response.status === 404) {
+          throw new Error('API endpoint not found');
+        } else if (response.status === 500) {
+          throw new Error('Server error - please try again later');
+        }
+        
         throw new Error(`HTTP ${response.status}: ${errorText || 'API request failed'}`);
       }
       
@@ -73,7 +96,11 @@ function App() {
       
       // Provide more specific error messages
       if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        throw new Error('Network error - please check your internet connection and try again');
+        throw new Error('Network error - please check your internet connection and backend server status');
+      }
+      
+      if (error.message.includes('CORS')) {
+        throw new Error('CORS error - backend server may need to allow requests from this domain');
       }
       
       throw error;
@@ -83,7 +110,7 @@ function App() {
   const fetchEmployees = async () => {
     try {
       console.log('Fetching employees...');
-      const data = await apiCall('/employees');
+      const data = await apiCall('/api/employees');
       setEmployees(data);
       console.log('Employees fetched successfully:', data);
     } catch (error) {
@@ -96,7 +123,7 @@ function App() {
     try {
       setLoading(true);
       console.log('Fetching all attendance...');
-      const data = await apiCall('/attendance');
+      const data = await apiCall('/api/attendance');
       setAttendanceRecords(data);
       setFilteredRecords(data);
       console.log('Attendance fetched successfully:', data);
@@ -109,7 +136,8 @@ function App() {
   };
 
   useEffect(() => {
-    console.log('Component mounted, fetching initial data...');
+    console.log('Component mounted, API Base URL:', API_BASE_URL);
+    console.log('Auth Token:', AUTH_TOKEN ? 'Present' : 'Not provided');
     fetchEmployees();
     fetchAllAttendance();
   }, []);
@@ -161,7 +189,7 @@ function App() {
           date: date
         };
 
-        return apiCall('/attendance', {
+        return apiCall('/api/attendance', {
           method: 'POST',
           body: JSON.stringify(attendanceData)
         });
@@ -197,7 +225,7 @@ function App() {
 
     try {
       setLoading(true);
-      const data = await apiCall(`/attendance/${searchEmpId}`);
+      const data = await apiCall(`/api/attendance/${searchEmpId}`);
       
       if (data.length === 0) {
         alert('No records found for this Employee ID');
