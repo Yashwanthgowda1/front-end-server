@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Users, UserPlus, Search, Download, RefreshCw, CalendarDays } from 'lucide-react';
+import { Download, RefreshCw } from 'lucide-react';
 
-const API_BASE_URL = 'http://localhost:3001/api';
+// Use proxy for development, direct URL for production
+const API_BASE_URL = import.meta.env.DEV ? '/api' : 'https://backend-server-git-main-yashwanths-projects-7a956bf7.vercel.app/api';
 
 function App() {
   const [employees, setEmployees] = useState([]);
@@ -41,34 +42,52 @@ function App() {
     }
   }, [attendanceType, selectedFromDate]);
 
-  // API Functions
+  // Enhanced API Functions with better error handling
   const apiCall = async (url, options = {}) => {
     try {
+      console.log('Making API call to:', `${API_BASE_URL}${url}`);
+      
       const response = await fetch(`${API_BASE_URL}${url}`, {
+        mode: 'cors', // Explicitly set CORS mode
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
           ...options.headers
         },
         ...options
       });
       
+      console.log('Response status:', response.status);
+      
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'API request failed');
+        const errorText = await response.text();
+        console.error('API Error Response:', errorText);
+        throw new Error(`HTTP ${response.status}: ${errorText || 'API request failed'}`);
       }
       
-      return await response.json();
+      const data = await response.json();
+      console.log('API Success:', data);
+      return data;
     } catch (error) {
       console.error('API Error:', error);
+      
+      // Provide more specific error messages
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        throw new Error('Network error - please check your internet connection and try again');
+      }
+      
       throw error;
     }
   };
 
   const fetchEmployees = async () => {
     try {
+      console.log('Fetching employees...');
       const data = await apiCall('/employees');
       setEmployees(data);
+      console.log('Employees fetched successfully:', data);
     } catch (error) {
+      console.error('Failed to fetch employees:', error);
       alert('Failed to fetch employees: ' + error.message);
     }
   };
@@ -76,10 +95,13 @@ function App() {
   const fetchAllAttendance = async () => {
     try {
       setLoading(true);
+      console.log('Fetching all attendance...');
       const data = await apiCall('/attendance');
       setAttendanceRecords(data);
       setFilteredRecords(data);
+      console.log('Attendance fetched successfully:', data);
     } catch (error) {
+      console.error('Failed to fetch attendance:', error);
       alert('Failed to fetch attendance records: ' + error.message);
     } finally {
       setLoading(false);
@@ -87,6 +109,7 @@ function App() {
   };
 
   useEffect(() => {
+    console.log('Component mounted, fetching initial data...');
     fetchEmployees();
     fetchAllAttendance();
   }, []);
