@@ -5,16 +5,12 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 3000,
-    open: true,
+    // port: 3000,
+    // open: true
     proxy: {
-      '/api': {
-        target: 'https://backend-server-git-main-yashwanths-projects-7a956bf7.vercel.app',
-        changeOrigin: true,
-        secure: true,
-        rewrite: (path) => path
-      }
-    }
+      '/api': "http://localhost:3001"
+    },
+    // Remove proxy configuration - we'll use direct API calls
   },
   build: {
     outDir: 'dist',
