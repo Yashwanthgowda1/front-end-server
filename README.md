@@ -1,17 +1,79 @@
-# React + Vite
+## Daily Attendance Tracking
+A web-based daily attendance tracking system designed to maintain and manage attendance records for all internal employees. This system provides an efficient solution for organizations to monitor employee attendance with real-time tracking capabilities.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Features
 
-Currently, two official plugins are available:
+Daily Attendance Tracking: Maintain comprehensive daily attendance records SAP Employee time sheets
+Internal Employee Management: Specifically designed for internal staff attendance
+Real-time Monitoring: Track employee check-in/check-out in real-time
+Attendance Reports: Generate detailed attendance reports and analytics
+Employee Database: Manage internal employee information and profiles
+Dashboard Interface: User-friendly dashboard for attendance overview
+Data Export: Export attendance data for HR and payroll purposes
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+🛠️ Tech Stack
 
-## Expanding the ESLint configuration
+Frontend: React.js
+Backend: Node.js with Express.js
+Database: PostgreSQL
+Runtime Environment: JavaScript
+API Architecture: RESTful API design
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+📋 Prerequisites
+Before running the Daily Attendance Tracking application, ensure you have:
+
+Node.js (v14 or higher)
+npm package manager
+PostgreSQL (v12 or higher)
+Git for version control
+
+🔧 Installation
+
+Clone the repository
+
+bash   git clone https://github.com/yourusername/daily-attendance-tracking.git
+   cd daily-attendance-tracking
+
+Install backend dependencies
+
+bash   cd backend
+   npm install
+
+Install frontend dependencies
+
+bash   cd ../frontend
+   npm install
+
+Database Setup
+
+Environment Configuration
+Create a .env file in the backend directory:
+
+env   PORT=5000
+   DB_HOST=localhost
+   DB_PORT=5432
+   DB_NAME=attendance_db
+   DB_USER=your_username
+   DB_PASSWORD=your_password
+   JWT_SECRET=your_jwt_secret_key
+   NODE_ENV=development
 
 
-<!--  if need to run move to attendence modules -->
+🚀 Running the Application
 
-npm run dev
+Start the backend server
+
+bash   cd backend
+   npm start
+   # or for development with auto-reload
+   npm run dev
+
+Start the frontend application
+
+bash   cd frontend
+   npm start
+
+Access the application
+
+Frontend: http://localhost:3000
+Backend API: http://localhost:5000
