@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Download, RefreshCw } from 'lucide-react';
 
 // Fixed API configuration - use environment variable or fallback to direct URL
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://backend-server-git-main-yashwanths-projects-7a956bf7.vercel.app';
+const API_BASE_URL = import.meta.env.VITE_API_DEV_URL
+const API_DEV_URL = import.meta.env.VITE_API_DEV_URL
 const AUTH_TOKEN = import.meta.env.VITE_AUTH_TOKEN; // Add auth token if needed
 
 function App() {
